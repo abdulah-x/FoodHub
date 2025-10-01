@@ -1,24 +1,47 @@
-import { useState } from "react";
-import MyCart from "./Components/Cart/MyCart";
-import Header from "./Components/Header/Header";
-import Meal from "./Components/Meal/Meal";
-import CartProvider from "./Components/store/CartContextProvider";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { UserProvider, useUser } from './contexts/UserContext';
+import CartProvider from './Components/store/CartContextProvider';
+import Login from './components/Login';
+import CustomerModule from './modules/customer/CustomerModule';
+import RestaurantModule from './modules/restaurant/RestaurantModule';
+import AdminModule from './modules/admin/AdminModule';
+import './App.css';
 
-function App() {
-  const [visibleCart, setCartVisible] = useState(false);
-  const showCartHandler = () => {
-    setCartVisible(true);
-  }
-  const hideCartHandler = () => {
-    setCartVisible(false);
+const AppRoutes = () => {
+  const { currentUser, isLoggedIn } = useUser();
+
+  if (!isLoggedIn) {
+    return <Login />;
   }
 
   return (
-    <CartProvider >
-      {visibleCart && <MyCart onDrop={hideCartHandler} />}
-      <Header onShowCart={showCartHandler} />
-      <Meal />
+    <CartProvider>
+      <Routes>
+        {currentUser?.role === 'customer' && (
+          <Route path="/*" element={<CustomerModule />} />
+        )}
+        {currentUser?.role === 'restaurant' && (
+          <Route path="/*" element={<RestaurantModule />} />
+        )}
+        {currentUser?.role === 'admin' && (
+          <Route path="/*" element={<AdminModule />} />
+        )}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </CartProvider>
+  );
+};
+
+function App() {
+  return (
+    <UserProvider>
+      <Router>
+        <div className="App">
+          <AppRoutes />
+        </div>
+      </Router>
+    </UserProvider>
   );
 }
 
