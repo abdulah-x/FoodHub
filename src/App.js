@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { UserProvider, useUser } from './contexts/UserContext';
 import CartProvider from './Components/store/CartContextProvider';
-import Login from './components/Login';
+import Login from './Components/Login';
 import CustomerModule from './modules/customer/CustomerModule';
 import RestaurantModule from './modules/restaurant/RestaurantModule';
 import AdminModule from './modules/admin/AdminModule';
