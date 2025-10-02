@@ -76,7 +76,9 @@ const RestaurantMenu = () => {
       id: item._id,
       name: item.name,
       amount: amount,
-      price: item.price
+      price: item.price,
+      restaurantId: restaurant?._id || id, // Use restaurant ID from state or URL param
+      restaurantName: restaurant?.name || 'Restaurant'
     });
   };
 
@@ -124,6 +126,8 @@ const RestaurantMenu = () => {
                     name={item.name}
                     desc={item.description}
                     price={item.price}
+                    restaurantId={restaurant?._id || id}
+                    restaurantName={restaurant?.name || 'Restaurant'}
                     onAddToCart={(amount) => addToCartHandler(item, amount)}
                   />
                 ))}

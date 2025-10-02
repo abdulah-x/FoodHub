@@ -46,4 +46,28 @@
     background-color: #8a2b06;
     color: white;
   }
+
+  .actions .button:disabled {
+    background-color: #ccc;
+    border-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .success {
+    text-align: center;
+    padding: 2rem;
+    background-color: #f0f8f0;
+    border-radius: 8px;
+    border: 2px solid #4caf50;
+  }
+
+  .success h2 {
+    color: #4caf50;
+    margin-bottom: 1rem;
+  }
+
+  .success p {
+    margin: 0.5rem 0;
+    color: #333;
+  }
   

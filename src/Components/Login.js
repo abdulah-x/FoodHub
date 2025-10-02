@@ -37,46 +37,69 @@ const Login = () => {
 
   return (
     <div className={classes.loginContainer}>
+      <div className={classes.heroSection}>
+        <div className={classes.heroContent}>
+          <h1 className={classes.heroTitle}>🍽️ FoodHub</h1>
+          <p className={classes.heroSubtitle}>Delicious food delivered to your doorstep</p>
+          <div className={classes.heroEmojis}>🍕 🍔 🍜 🍱 🌮 🍰</div>
+        </div>
+      </div>
+      
       <div className={classes.loginForm}>
-        <h2>{isRegistering ? 'Register' : 'Login'} to ReactMeals</h2>
+        <div className={classes.formHeader}>
+          <h2>{isRegistering ? '🚀 Join FoodHub' : '👋 Welcome Back'}</h2>
+          <p>{isRegistering ? 'Create your account to start ordering' : 'Sign in to continue your food journey'}</p>
+        </div>
         
-        {error && <div className={classes.error}>{error}</div>}
+        {error && <div className={classes.error}>⚠️ {error}</div>}
         
         <form onSubmit={isRegistering ? handleRegister : handleLogin}>
           {isRegistering && (
             <>
-              <input
-                type="text"
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-              <input
-                type="tel"
-                placeholder="Phone Number"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                required
-              />
-              <select value={role} onChange={(e) => setRole(e.target.value)}>
-                <option value="customer">Customer</option>
-                <option value="restaurant">Restaurant Owner</option>
-                <option value="admin">Admin</option>
-              </select>
+              <div className={classes.inputGroup}>
+                <span className={classes.inputIcon}>👤</span>
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className={classes.inputGroup}>
+                <span className={classes.inputIcon}>📱</span>
+                <input
+                  type="tel"
+                  placeholder="Phone Number"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  required
+                />
+              </div>
+              <div className={classes.inputGroup}>
+                <span className={classes.inputIcon}>🏷️</span>
+                <select value={role} onChange={(e) => setRole(e.target.value)}>
+                  <option value="customer">🛒 Customer</option>
+                  <option value="restaurant">🏪 Restaurant Owner</option>
+                  <option value="admin">👑 Admin</option>
+                </select>
+              </div>
             </>
           )}
           
-          <input
-            type="email"
-            placeholder="Email Address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <div className={classes.inputGroup}>
+            <span className={classes.inputIcon}>✉️</span>
+            <input
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
           
-          <button type="submit">
-            {isRegistering ? 'Register' : 'Login'}
+          <button type="submit" className={classes.submitButton}>
+            {isRegistering ? '🚀 Create Account' : '🍽️ Enter FoodHub'}
           </button>
         </form>
         

@@ -10,15 +10,21 @@ app.use(cors());
 app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/reactmeals', {
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/reactmeals', {
   useNewUrlParser: true,
   useUnifiedTopology: true,
+  family: 4, // Use IPv4, skip trying IPv6
 });
 
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+db.on('error', (error) => {
+  console.error('MongoDB connection error:', error);
+});
 db.once('open', () => {
-  console.log('Connected to MongoDB');
+  console.log('Connected to MongoDB successfully');
+});
+db.on('disconnected', () => {
+  console.log('MongoDB disconnected');
 });
 
 // Import routes

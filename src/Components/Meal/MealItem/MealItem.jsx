@@ -12,7 +12,9 @@ const MealItem = (props) => {
             name: props.name,
             id: props.id,
             price: props.price,
-            amount: amount
+            amount: amount,
+            restaurantId: props.restaurantId || props.restaurant, // Include restaurant ID
+            restaurantName: props.restaurantName || 'Unknown Restaurant'
         });
     }
 

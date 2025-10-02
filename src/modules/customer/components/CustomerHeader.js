@@ -10,17 +10,32 @@ const CustomerHeader = ({ onShowCart }) => {
   return (
     <header className={classes.header}>
       <div className={classes.headerContent}>
-        <h1>ReactMeals - Customer</h1>
+        <div className={classes.logo}>
+          <h1>🍽️ FoodHub</h1>
+          <p className={classes.tagline}>Delicious food, delivered fast</p>
+        </div>
         
         <nav className={classes.nav}>
-          <Link to="/" className={classes.navLink}>Restaurants</Link>
-          <Link to="/orders" className={classes.navLink}>My Orders</Link>
+          <Link to="/" className={classes.navLink}>
+            <span className={classes.navIcon}>🏪</span>
+            Restaurants
+          </Link>
+          <Link to="/orders" className={classes.navLink}>
+            <span className={classes.navIcon}>📋</span>
+            My Orders
+          </Link>
         </nav>
         
         <div className={classes.headerActions}>
-          <span className={classes.welcome}>Welcome, {currentUser?.name}!</span>
+          <div className={classes.userInfo}>
+            <span className={classes.userIcon}>👋</span>
+            <span className={classes.welcome}>Hi, {currentUser?.name?.split(' ')[0]}!</span>
+          </div>
           <HeaderButton onClick={onShowCart}>Cart</HeaderButton>
-          <button onClick={logout} className={classes.logoutBtn}>Logout</button>
+          <button onClick={logout} className={classes.logoutBtn}>
+            <span>🚪</span>
+            Logout
+          </button>
         </div>
       </div>
     </header>
