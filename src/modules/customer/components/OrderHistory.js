@@ -77,57 +77,127 @@ const OrderHistory = () => {
     return <div className={classes.loading}>Loading order history...</div>;
   }
 
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'pending': return '⏳';
+      case 'confirmed': return '✅';
+      case 'preparing': return '👨‍🍳';
+      case 'ready': return '📦';
+      case 'delivered': return '🚚';
+      case 'cancelled': return '❌';
+      default: return '📋';
+    }
+  };
+
   return (
     <div className={classes.container}>
-      <h1>My Order History</h1>
+      {/* Modern Header */}
+      <div className={classes.headerSection}>
+        <div className={classes.headerContent}>
+          <h1 className={classes.title}>
+            <span className={classes.titleIcon}>📋</span>
+            My Order History
+          </h1>
+          <p className={classes.subtitle}>Track your food journey and reorder your favorites</p>
+        </div>
+      </div>
 
       {error && <div className={classes.error}>{error}</div>}
 
       {orders.length === 0 ? (
-        <div className={classes.noOrders}>
-          <p>You haven't placed any orders yet.</p>
-          <p>Start exploring restaurants to place your first order!</p>
+        <div className={classes.emptyState}>
+          <div className={classes.emptyContent}>
+            <span className={classes.emptyIcon}>🍽️</span>
+            <h3>No orders yet!</h3>
+            <p>You haven't placed any orders yet.</p>
+            <p>Start exploring restaurants to place your first order!</p>
+            <button className={classes.exploreBtn}>
+              🔍 Explore Restaurants
+            </button>
+          </div>
         </div>
       ) : (
-        <div className={classes.ordersList}>
-          {orders.map(order => (
-            <Card key={order._id} className={classes.orderCard}>
-              <div className={classes.orderHeader}>
-                <div>
-                  <h3>{order.restaurant?.name || 'Unknown Restaurant'}</h3>
-                  <p className={classes.orderDate}>{formatDate(order.createdAt)}</p>
+        <div className={classes.ordersContainer}>
+          <div className={classes.ordersList}>
+            {orders.map(order => (
+              <div key={order._id} className={classes.orderCard}>
+                <div className={classes.cardHeader}>
+                  <div className={classes.restaurantInfo}>
+                    <div className={classes.restaurantIcon}>🏪</div>
+                    <div>
+                      <h3 className={classes.restaurantName}>
+                        {order.restaurant?.name || 'Unknown Restaurant'}
+                      </h3>
+                      <p className={classes.orderDate}>
+                        📅 {formatDate(order.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  <div className={classes.statusContainer}>
+                    <span className={classes.statusBadge} data-status={order.status}>
+                      <span className={classes.statusIcon}>
+                        {getStatusIcon(order.status)}
+                      </span>
+                      <span className={classes.statusText}>
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      </span>
+                    </span>
+                  </div>
                 </div>
-                <span 
-                  className={classes.status}
-                  style={{ backgroundColor: getStatusColor(order.status) }}
-                >
-                  {order.status.toUpperCase()}
-                </span>
-              </div>
 
-              <div className={classes.orderItems}>
-                <h4>Items:</h4>
-                <ul>
-                  {order.items.map((item, index) => (
-                    <li key={index} className={classes.orderItem}>
-                      <span>{item.quantity}x {item.menuItem?.name || 'Unknown Item'}</span>
-                      <span>${(item.price * item.quantity).toFixed(2)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                <div className={classes.orderContent}>
+                  <div className={classes.itemsSection}>
+                    <h4 className={classes.sectionTitle}>
+                      <span className={classes.sectionIcon}>🍴</span>
+                      Items Ordered
+                    </h4>
+                    <div className={classes.itemsList}>
+                      {order.items.map((item, index) => (
+                        <div key={index} className={classes.orderItem}>
+                          <div className={classes.itemInfo}>
+                            <span className={classes.itemQuantity}>{item.quantity}×</span>
+                            <span className={classes.itemName}>
+                              {item.menuItem?.name || 'Unknown Item'}
+                            </span>
+                          </div>
+                          <span className={classes.itemPrice}>
+                            ${((item.price || item.menuItem?.price || 0) * item.quantity).toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-              <div className={classes.orderTotal}>
-                <strong>Total: ${order.totalAmount.toFixed(2)}</strong>
-              </div>
+                  <div className={classes.orderSummary}>
+                    <div className={classes.totalSection}>
+                      <span className={classes.totalLabel}>💰 Total Amount</span>
+                      <span className={classes.totalAmount}>${order.totalAmount.toFixed(2)}</span>
+                    </div>
+                  </div>
 
-              {order.notes && (
-                <div className={classes.orderNotes}>
-                  <strong>Notes:</strong> {order.notes}
+                  {order.notes && (
+                    <div className={classes.notesSection}>
+                      <h4 className={classes.sectionTitle}>
+                        <span className={classes.sectionIcon}>📝</span>
+                        Special Notes
+                      </h4>
+                      <p className={classes.notes}>{order.notes}</p>
+                    </div>
+                  )}
+
+                  <div className={classes.orderActions}>
+                    <button className={classes.actionBtn}>
+                      🔄 Reorder
+                    </button>
+                    <button className={classes.actionBtn}>
+                      📞 Contact Restaurant
+                    </button>
+                  </div>
                 </div>
-              )}
-            </Card>
-          ))}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
