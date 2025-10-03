@@ -111,6 +111,18 @@ const MyCart = (props) => {
         </Modal>
     }
     
+    if (cntxt.items.length === 0) {
+        return <Modal drop={props.onDrop}>
+            <div className={classes.empty}>
+                <h2>🛒 Your Cart is Empty</h2>
+                <p>Add some delicious items to get started!</p>
+                <div className={classes.actions}>
+                    <button onClick={props.onDrop} className={classes.button}>Continue Shopping</button>
+                </div>
+            </div>
+        </Modal>
+    }
+
     return <Modal drop={props.onDrop}>
         {cartItems}
         <div >

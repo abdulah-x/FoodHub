@@ -73,6 +73,20 @@ const getRestaurantData = (ownerId) => [
     rating: 4.8,
     deliveryFee: 3.49,
     minOrder: 20.00
+  },
+  {
+    name: "Taco Fiesta",
+    description: "Authentic Mexican tacos and vibrant flavors",
+    owner: ownerId,
+    cuisineType: "Mexican",
+    address: {
+      street: "987 Taco Blvd",
+      city: "New York",
+      zipCode: "10006"
+    },
+    rating: 4.6,
+    deliveryFee: 2.49,
+    minOrder: 12.00
   }
 ];
 
@@ -193,7 +207,43 @@ async function setupDatabase() {
       }
     ];
 
-    const allMenuItems = [...pizzaItems, ...burgerItems, ...sushiItems];
+    // Taco Fiesta menu
+    const tacoItems = [
+      {
+        name: "Beef Tacos",
+        description: "Seasoned ground beef with lettuce, tomato, cheese",
+        price: 11.99,
+        category: "Tacos",
+        restaurant: restaurants[3]._id,
+        image: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=300"
+      },
+      {
+        name: "Chicken Quesadilla",
+        description: "Grilled chicken with melted cheese in flour tortilla",
+        price: 10.99,
+        category: "Quesadilla",
+        restaurant: restaurants[3]._id,
+        image: "https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=300"
+      },
+      {
+        name: "Fish Tacos",
+        description: "Grilled fish with cabbage slaw and lime crema",
+        price: 13.99,
+        category: "Tacos",
+        restaurant: restaurants[3]._id,
+        image: "https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?w=300"
+      },
+      {
+        name: "Guacamole & Chips",
+        description: "Fresh avocado dip with crispy tortilla chips",
+        price: 7.99,
+        category: "Appetizer",
+        restaurant: restaurants[3]._id,
+        image: "https://images.unsplash.com/photo-1541544181051-e46607e4370c?w=300"
+      }
+    ];
+
+    const allMenuItems = [...pizzaItems, ...burgerItems, ...sushiItems, ...tacoItems];
     const createdMenuItems = await MenuItem.create(allMenuItems);
     console.log(`Created ${createdMenuItems.length} menu items`);
 

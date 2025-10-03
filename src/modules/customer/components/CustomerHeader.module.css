@@ -9,9 +9,10 @@
   color: white;
   display: flex;
   align-items: center;
-  z-index: 100;
+  z-index: 1000;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
 }
 
 .headerContent {
@@ -81,7 +82,7 @@
 .headerActions {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .userInfo {
@@ -129,6 +130,8 @@
 .logoutBtn span {
   font-size: 1rem;
 }
+
+
 
 /* Mobile Styles */
 @media (max-width: 768px) {
