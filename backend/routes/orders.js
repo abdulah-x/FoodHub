@@ -21,6 +21,26 @@ router.post('/', async (req, res) => {
   try {
     const order = new Order(req.body);
     const savedOrder = await order.save();
+    
+    // Populate order details for notification
+    const populatedOrder = await Order.findById(savedOrder._id)
+      .populate('customer', 'name email phone')
+      .populate('restaurant', 'name')
+      .populate('items.menuItem', 'name price');
+    
+    // Emit new order notification to restaurant
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`restaurant_${req.body.restaurant}`).emit('newOrder', {
+        _id: populatedOrder._id,
+        customer: populatedOrder.customer,
+        items: populatedOrder.items,
+        totalAmount: populatedOrder.totalAmount,
+        status: populatedOrder.status,
+        timestamp: new Date()
+      });
+    }
+    
     res.status(201).json(savedOrder);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -84,6 +104,26 @@ router.patch('/:id/status', async (req, res) => {
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
+
+    // Emit order status update to both customer and restaurant
+    const io = req.app.get('io');
+    if (io) {
+      const updateData = {
+        _id: order._id,
+        status: order.status,
+        customer: order.customer,
+        restaurant: order.restaurant,
+        totalAmount: order.totalAmount,
+        timestamp: new Date()
+      };
+
+      // Notify customer
+      io.to(`customer_${order.customer._id}`).emit('orderUpdate', updateData);
+      
+      // Notify restaurant
+      io.to(`restaurant_${order.restaurant._id}`).emit('orderUpdate', updateData);
+    }
+    
     res.json(order);
   } catch (error) {
     res.status(400).json({ message: error.message });

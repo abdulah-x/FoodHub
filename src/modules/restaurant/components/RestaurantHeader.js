@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useUser } from '../../../contexts/UserContext';
+import NotificationCenter from '../../../Components/Notifications/NotificationCenter';
 import classes from './RestaurantHeader.module.css';
 
 const RestaurantHeader = () => {
@@ -33,6 +34,7 @@ const RestaurantHeader = () => {
         
         <div className={classes.headerActions}>
           <span className={classes.welcome}>Welcome, {currentUser?.name}!</span>
+          <NotificationCenter />
           <button onClick={logout} className={classes.logoutBtn}>Logout</button>
         </div>
       </div>

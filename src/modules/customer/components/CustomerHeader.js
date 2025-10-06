@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../../../contexts/UserContext';
 import HeaderButton from '../../../Components/Header/HeaderButton';
+import NotificationCenter from '../../../Components/Notifications/NotificationCenter';
 import classes from './CustomerHeader.module.css';
 
 const CustomerHeader = ({ onShowCart }) => {
@@ -31,6 +32,7 @@ const CustomerHeader = ({ onShowCart }) => {
             <span className={classes.userIcon}>👋</span>
             <span className={classes.welcome}>Hi, {currentUser?.name?.split(' ')[0]}!</span>
           </div>
+          <NotificationCenter />
           <HeaderButton onClick={onShowCart}>Cart</HeaderButton>
           <button onClick={logout} className={classes.logoutBtn}>
             <span>🚪</span>

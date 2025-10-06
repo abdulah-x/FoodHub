@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { UserProvider, useUser } from './contexts/UserContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import CartProvider from './Components/store/CartContextProvider';
 import Login from './Components/Login';
 import CustomerModule from './modules/customer/CustomerModule';
@@ -36,11 +37,13 @@ const AppRoutes = () => {
 function App() {
   return (
     <UserProvider>
-      <Router>
-        <div className="App">
-          <AppRoutes />
-        </div>
-      </Router>
+      <NotificationProvider>
+        <Router>
+          <div className="App">
+            <AppRoutes />
+          </div>
+        </Router>
+      </NotificationProvider>
     </UserProvider>
   );
 }
