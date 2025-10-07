@@ -2,8 +2,15 @@ import React from "react";
 import classes from "./Card.module.css";
 
 const Card = (props) => {
-    return <div className={classes.card}>
-        {props.children}
+    const { children, className, ...otherProps } = props;
+    const cardClasses = className ? `${classes.card} ${className}` : classes.card;
+    
+    return <div 
+        className={cardClasses} 
+        data-testid={otherProps['data-testid'] || "card"}
+        {...otherProps}
+    >
+        {children}
     </div>
 }
 

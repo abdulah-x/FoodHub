@@ -3,11 +3,11 @@ import classes from "./Modal.module.css";
 import ReactDOM from "react-dom";
 
 const BackDp = (props) => {
-    return <div onClick={props.drop} className={classes.backdp} ></div>
+    return <div onClick={props.drop} className={classes.backdp} data-testid="modal-backdrop"></div>
 }
 const Overlay = (props) => {
-    return <div className={classes.overlay}>
-        <div className={classes.content}>
+    return <div className={classes.overlay} data-testid="modal">
+        <div className={classes.content} data-testid="modal-content">
             {props.children}
         </div>
     </div>
