@@ -266,7 +266,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👨‍💻 Author
 
-**Abdul Ahad** - [@abdulah-x](https://github.com/abdulah-x)
+**Muhammad Abdullah** - [@abdulah-x](https://github.com/abdulah-x)
 
 ---
 
@@ -274,4 +274,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Note**: This project represents a significant expansion of the original ReactMeals application, transforming it from a simple menu display into a full-featured food delivery platform with multiple user roles and comprehensive functionality.
+**Note**: This project represents a significant expansion of the original *ReactMeals* application, transforming it from a simple menu display into a full-featured food delivery platform with multiple user roles and comprehensive functionality.
