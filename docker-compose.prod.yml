@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: foodhub-mongodb-prod
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
+    ports:
+      - "27017:27017"
+    volumes:
+      # Persistent volume for database data (requirement: data persistence)
+      - /opt/foodhub/data/mongodb:/data/db
+      - /opt/foodhub/data/mongodb-config:/data/configdb
+    networks:
+      - foodhub-network
+    command: mongod --auth
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Backend API Server (using Docker Hub image)
+  backend:
+    image: ${DOCKER_USERNAME}/foodhub-backend:latest
+    container_name: foodhub-backend-prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb:27017/${MONGO_DB_NAME}?authSource=admin
+      CORS_ORIGIN: ${FRONTEND_URL}
+    ports:
+      - "8080:8080"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - /opt/foodhub/logs:/app/logs
+    networks:
+      - foodhub-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Frontend React Application (using Docker Hub image)
+  frontend:
+    image: ${DOCKER_USERNAME}/foodhub-frontend:latest
+    container_name: foodhub-frontend-prod
+    restart: always
+    environment:
+      REACT_APP_API_URL: ${BACKEND_URL}
+      REACT_APP_SOCKET_URL: ${BACKEND_URL}
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - foodhub-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Networks
+networks:
+  foodhub-network:
+    driver: bridge
+    name: foodhub-network-prod
+
+# Volumes (Persistent storage for database - requirement)
+volumes:
+  mongodb_data:
+    driver: local

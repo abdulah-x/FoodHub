@@ -1,0 +1,231 @@
+.container {
+  margin-top: 6rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  color: #6c5ce7;
+}
+
+.stats {
+  display: flex;
+  gap: 2rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+.restaurantsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.restaurantCard {
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.restaurantCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.restaurantHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.restaurantInfo h3 {
+  color: #6c5ce7;
+  margin-bottom: 0.5rem;
+  font-size: 1.3rem;
+}
+
+.description {
+  color: #666;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.meta {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.cuisine {
+  background: #f0efff;
+  color: #6c5ce7;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.rating {
+  font-weight: bold;
+  color: #ff9500;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+}
+
+.statusBadge {
+  color: white;
+  padding: 0.4rem 0.8rem;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.active {
+  background: #28a745;
+}
+
+.inactive {
+  background: #dc3545;
+}
+
+.ownerInfo {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 5px;
+}
+
+.ownerInfo h4 {
+  color: #6c5ce7;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.ownerInfo p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.businessInfo {
+  margin-bottom: 1rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.infoGrid div {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.restaurantActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid #eee;
+}
+
+.toggleBtn,
+.deleteBtn {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.activateBtn {
+  background: #28a745;
+  color: white;
+}
+
+.activateBtn:hover {
+  background: #1e7e34;
+}
+
+.deactivateBtn {
+  background: #ffc107;
+  color: #333;
+}
+
+.deactivateBtn:hover {
+  background: #e0a800;
+}
+
+.deleteBtn {
+  background: #dc3545;
+  color: white;
+}
+
+.deleteBtn:hover {
+  background: #c82333;
+}
+
+.noRestaurants {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+    margin-top: 5rem;
+  }
+  
+  .header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .stats {
+    justify-content: space-around;
+  }
+  
+  .restaurantHeader {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: stretch;
+  }
+  
+  .status {
+    justify-content: flex-end;
+  }
+  
+  .infoGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .restaurantActions {
+    justify-content: center;
+  }
+}

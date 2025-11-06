@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: foodhub-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-password123}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME:-reactmeals}
+    ports:
+      - "27017:27017"
+    volumes:
+      # Persistent volume for database data (requirement: data persistence)
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+      # Initialize database script
+      - ./backend/setupDatabase.js:/docker-entrypoint-initdb.d/setupDatabase.js:ro
+    networks:
+      - foodhub-network
+    command: mongod --auth
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Backend API Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: foodhub-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      MONGODB_URI: mongodb://${MONGO_ROOT_USERNAME:-admin}:${MONGO_ROOT_PASSWORD:-password123}@mongodb:27017/${MONGO_DB_NAME:-reactmeals}?authSource=admin
+      # Socket.io configuration
+      CORS_ORIGIN: ${FRONTEND_URL:-http://localhost:3000}
+    ports:
+      - "8080:8080"
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      # Optional: Mount logs directory
+      - ./logs:/app/logs
+    networks:
+      - foodhub-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Frontend React Application
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: foodhub-frontend
+    restart: unless-stopped
+    environment:
+      REACT_APP_API_URL: ${BACKEND_URL:-http://localhost:8080}
+      REACT_APP_SOCKET_URL: ${BACKEND_URL:-http://localhost:8080}
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - foodhub-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+# Networks
+networks:
+  foodhub-network:
+    driver: bridge
+    name: foodhub-network
+
+# Volumes (Persistent storage for database - requirement)
+volumes:
+  mongodb_data:
+    driver: local
+    name: foodhub_mongodb_data
+  mongodb_config:
+    driver: local
+    name: foodhub_mongodb_config
