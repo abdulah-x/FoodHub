@@ -1,71 +1,37 @@
-# Node.js dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# STRICT - Only allow essential containerization files
 
-# Build outputs
+# Block ALL development files
+node_modules/
 build/
 dist/
+*.log
+logs/
+.env*
+!.env.template
 
-# Environment files (except examples)
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+# Block documentation and guides
+*.md
+!README.md
 
-# IDE and editor files
+# Block IDE and OS files
 .vscode/
 .idea/
 *.swp
-*.swo
-*~
-
-# OS generated files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Logs
-logs/
-*.log
+# Block all scripts and automation
+scripts/
+*.sh
+*.bat
 
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
+# Block test files
+**/*.test.*
+**/*.spec.*
 coverage/
-*.lcov
 
-# nyc test coverage
-.nyc_output
-
-# Optional npm cache directory
+# Block runtime data
+*.pid
+pids/
 .npm
-
-# Optional eslint cache
-.eslintcache
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# Test files (optional)
-**/*.test.js
-**/*.test.jsx
-**/*.spec.js
-**/*.spec.jsx
-
-# Misc
-.sass-cache/
-.stylelintcache
+.cache/

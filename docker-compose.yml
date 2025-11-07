@@ -16,8 +16,6 @@ services:
       # Persistent volume for database data (requirement: data persistence)
       - mongodb_data:/data/db
       - mongodb_config:/data/configdb
-      # Initialize database script
-      - ./backend/setupDatabase.js:/docker-entrypoint-initdb.d/setupDatabase.js:ro
     networks:
       - foodhub-network
     command: mongod --auth
