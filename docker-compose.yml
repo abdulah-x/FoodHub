@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # MongoDB Database
   mongodb:
@@ -69,8 +67,7 @@ services:
     ports:
       - "3000:80"
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     networks:
       - foodhub-network
     healthcheck:

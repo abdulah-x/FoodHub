@@ -9,6 +9,15 @@ logs/
 .env*
 !.env.template
 
+# Block sensitive files (SECURITY)
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+foodhub-docker-key*
+proj_deploy*
+
 # Block documentation and guides
 *.md
 !README.md

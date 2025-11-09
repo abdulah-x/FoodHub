@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install all dependencies (including devDependencies for building)
-RUN npm ci && npm cache clean --force
+RUN npm install && npm cache clean --force
 
 # Copy source code
 COPY . .
@@ -29,11 +29,7 @@ COPY --from=builder /app/build /usr/share/nginx/html
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Create a non-root user
-RUN addgroup -g 1001 -S nginx && \
-    adduser -S nginx -u 1001 -G nginx
-
-# Change ownership of nginx directories
+# Create a non-root user (nginx user already exists, just use it)
 RUN chown -R nginx:nginx /var/cache/nginx && \
     chown -R nginx:nginx /var/log/nginx && \
     chown -R nginx:nginx /etc/nginx/conf.d && \
@@ -46,9 +42,9 @@ USER nginx
 # Expose port 80
 EXPOSE 80
 
-# Add health check (wget is available in nginx alpine image)
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:80/health || exit 1
+# Add health check - simple curl check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://127.0.0.1:80/ || exit 1
 
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
