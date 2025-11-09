@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # MongoDB service for Jenkins builds
+  foodhub-mongo-jenkins:
+    image: mongo:5.0
+    container_name: foodhub-mongo-jenkins
+    restart: unless-stopped
+    ports:
+      - "27019:27017"  # Different port from production (27018)
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - foodhub_mongo_jenkins_data:/data/db
+    networks:
+      - foodhub-jenkins-network
+
+  # Backend Node.js API service for Jenkins builds
+  foodhub-backend-jenkins:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: foodhub-backend-jenkins
+    restart: unless-stopped
+    ports:
+      - "8082:8080"  # Different port from production (8080)
+    environment:
+      NODE_ENV: development
+      MONGO_URL: mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@foodhub-mongo-jenkins:27017/foodhub?authSource=admin
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 8080
+    volumes:
+      # Volume mounting instead of COPY in Dockerfile
+      - ./backend:/app/backend
+      - ./package.json:/app/package.json
+      - /app/node_modules
+    depends_on:
+      - foodhub-mongo-jenkins
+    networks:
+      - foodhub-jenkins-network
+
+  # Frontend React service for Jenkins builds
+  foodhub-frontend-jenkins:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: foodhub-frontend-jenkins
+    restart: unless-stopped
+    ports:
+      - "3001:80"  # Different port from production (80)
+    volumes:
+      # Volume mounting instead of COPY in Dockerfile
+      - ./src:/app/src
+      - ./public:/app/public
+      - ./package.json:/app/package.json
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - foodhub-backend-jenkins
+    networks:
+      - foodhub-jenkins-network
+
+volumes:
+  foodhub_mongo_jenkins_data:
+    driver: local
+
+networks:
+  foodhub-jenkins-network:
+    driver: bridge
