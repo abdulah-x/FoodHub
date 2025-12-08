@@ -102,6 +102,77 @@ pipeline {
             }
         }
         
+        stage('Selenium Automated Tests') {
+            steps {
+                echo '=========================================='
+                echo 'Running Selenium Automated Test Suite...'
+                echo '=========================================='
+                
+                script {
+                    try {
+                        // Build Selenium test container
+                        sh '''
+                            echo "Building Selenium test container..."
+                            docker build -f Dockerfile.selenium -t foodhub-selenium-tests:latest .
+                        '''
+                        
+                        // Run Selenium tests in Docker container
+                        sh '''
+                            echo "Running Selenium tests in containerized environment..."
+                            docker run --rm \
+                                --network host \
+                                -v ${WORKSPACE}/tests/selenium/reports:/app/reports \
+                                -v ${WORKSPACE}/tests/selenium/screenshots:/app/screenshots \
+                                -e BASE_URL=http://localhost:3001 \
+                                -e API_URL=http://localhost:8082 \
+                                foodhub-selenium-tests:latest \
+                                pytest /app/tests/test_foodhub.py -v \
+                                    --html=/app/reports/test_report.html \
+                                    --self-contained-html \
+                                    --tb=short
+                        '''
+                        
+                        echo '✓ All Selenium tests passed successfully!'
+                        
+                    } catch (Exception e) {
+                        echo "⚠ Warning: Some Selenium tests failed: ${e.message}"
+                        echo "Continuing pipeline execution..."
+                        currentBuild.result = 'UNSTABLE'
+                    }
+                }
+            }
+            
+            post {
+                always {
+                    // Publish Selenium test reports
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: 'tests/selenium/reports',
+                        reportFiles: 'test_report.html',
+                        reportName: 'Selenium Test Report',
+                        reportTitles: 'FoodHub Selenium Automated Tests'
+                    ])
+                    
+                    // Archive test screenshots if any failures occurred
+                    archiveArtifacts artifacts: 'tests/selenium/screenshots/*.png', 
+                                    fingerprint: true,
+                                    allowEmptyArchive: true
+                    
+                    echo 'Selenium test reports published'
+                }
+                
+                success {
+                    echo '✓ Selenium testing stage completed successfully'
+                }
+                
+                failure {
+                    echo '✗ Selenium testing stage failed'
+                }
+            }
+        }
+        
         stage('Collect Build Artifacts') {
             steps {
                 echo 'Collecting build artifacts...'
