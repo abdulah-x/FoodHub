@@ -20,6 +20,9 @@ RUN npm run build
 # Stage 2: Serve the application with nginx
 FROM nginx:alpine
 
+# Install curl for healthchecks
+RUN apk add --no-cache curl
+
 # Remove default nginx static assets
 RUN rm -rf /usr/share/nginx/html/*
 
