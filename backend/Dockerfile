@@ -8,8 +8,11 @@ WORKDIR /app
 # Copy package files first (for better Docker layer caching)
 COPY package*.json ./
 
-# Install production dependencies
-RUN npm install --only=production && npm cache clean --force
+# Install production dependencies with retry logic
+RUN npm install --only=production --loglevel=error --no-audit || \
+    (echo "Retrying npm install..." && sleep 5 && npm install --only=production --loglevel=error --no-audit) || \
+    (echo "Second retry..." && sleep 10 && npm install --only=production --loglevel=error --no-audit) \
+    && npm cache clean --force
 
 # Install wget for health checks
 RUN apk add --no-cache wget
