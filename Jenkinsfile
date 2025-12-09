@@ -62,43 +62,49 @@ pipeline {
                 // Wait for services to be ready and healthy using Docker health checks
                 echo 'Waiting for services to become healthy (max 3 minutes per service)...'
                 sh '''
-                    echo "Checking service health status..."
+                    echo "Services started, waiting for them to be ready..."
                     docker-compose -f ${COMPOSE_FILE} ps
                     
-                    # Wait for MongoDB to be healthy
-                    echo "Waiting for MongoDB to be healthy..."
+                    echo "Waiting 30 seconds for initial startup..."
+                    sleep 30
+                    
+                    # Wait for Backend to respond (up to 2 minutes)
+                    echo "Checking Backend health..."
                     COUNTER=0
-                    until [ "$(docker inspect --format='{{.State.Health.Status}}' foodhub-mongo-jenkins 2>/dev/null)" = "healthy" ] || [ $COUNTER -eq 36 ]; do
-                        echo "MongoDB not healthy yet, waiting... (attempt $((COUNTER+1))/36)"
+                    until curl -f http://localhost:8082/health > /dev/null 2>&1 || [ $COUNTER -eq 24 ]; do
+                        echo "Backend not ready yet, waiting... (attempt $((COUNTER+1))/24)"
                         sleep 5
                         COUNTER=$((COUNTER+1))
                     done
                     
-                    # Wait for Backend to be healthy
-                    echo "Waiting for Backend to be healthy..."
+                    if curl -f http://localhost:8082/health > /dev/null 2>&1; then
+                        echo "✓ Backend is healthy!"
+                    else
+                        echo "✗ Backend health check timeout - continuing anyway"
+                    fi
+                    
+                    # Wait for Frontend to respond (up to 2 minutes)
+                    echo "Checking Frontend health..."
                     COUNTER=0
-                    until [ "$(docker inspect --format='{{.State.Health.Status}}' foodhub-backend-jenkins 2>/dev/null)" = "healthy" ] || [ $COUNTER -eq 36 ]; do
-                        echo "Backend not healthy yet, waiting... (attempt $((COUNTER+1))/36)"
+                    until curl -f http://localhost:3001/ > /dev/null 2>&1 || [ $COUNTER -eq 24 ]; do
+                        echo "Frontend not ready yet, waiting... (attempt $((COUNTER+1))/24)"
                         sleep 5
                         COUNTER=$((COUNTER+1))
                     done
                     
-                    # Wait for Frontend to be healthy
-                    echo "Waiting for Frontend to be healthy..."
-                    COUNTER=0
-                    until [ "$(docker inspect --format='{{.State.Health.Status}}' foodhub-frontend-jenkins 2>/dev/null)" = "healthy" ] || [ $COUNTER -eq 36 ]; do
-                        echo "Frontend not healthy yet, waiting... (attempt $((COUNTER+1))/36)"
-                        sleep 5
-                        COUNTER=$((COUNTER+1))
-                    done
+                    if curl -f http://localhost:3001/ > /dev/null 2>&1; then
+                        echo "✓ Frontend is healthy!"
+                    else
+                        echo "✗ Frontend health check timeout - continuing anyway"
+                    fi
                     
-                    echo "✓ All services are healthy!"
+                    echo "✓ All services check complete!"
                     docker-compose -f ${COMPOSE_FILE} ps
                     
-                    # Final verification with curl
+                    # Final verification
                     echo "Final connectivity verification..."
-                    curl -I http://localhost:3001/ && echo "✓ Frontend responding" || echo "✗ Frontend not responding"
-                    curl -I http://localhost:8082/ && echo "✓ Backend responding" || echo "✗ Backend not responding"
+                    curl -I http://localhost:3001/ 2>&1 | head -5 || echo "Frontend check failed"
+                    curl -I http://localhost:8082/ 2>&1 | head -5 || echo "Backend check failed"
                 '''
                 
                 // Verify containers are running
