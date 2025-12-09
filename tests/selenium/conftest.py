@@ -30,12 +30,12 @@ def driver():
     chrome_options.add_experimental_option("excludeSwitches", ["enable-automation"])
     chrome_options.add_experimental_option('useAutomationExtension', False)
     
-    # For Brave browser - uncomment and adjust path if needed
-    brave_path = "C:\\Program Files\\BraveSoftware\\Brave-Browser\\Application\\brave.exe"
+    # Use system Chromium in Docker
     import os
-    if os.path.exists(brave_path):
-        chrome_options.binary_location = brave_path
-        print(f"Using Brave browser from: {brave_path}")
+    if os.path.exists("/usr/bin/chromium-browser"):
+        chrome_options.binary_location = "/usr/bin/chromium-browser"
+    elif os.path.exists("/usr/bin/chromium"):
+        chrome_options.binary_location = "/usr/bin/chromium"
     
     # Initialize WebDriver
     try:

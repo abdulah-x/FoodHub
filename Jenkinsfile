@@ -110,10 +110,10 @@ pipeline {
                 
                 script {
                     try {
-                        // Build Selenium test container
+                        // Build lightweight Selenium test container
                         sh '''
-                            echo "Building Selenium test container..."
-                            docker build -f Dockerfile.selenium -t foodhub-selenium-tests:latest .
+                            echo "Building lightweight Selenium test container..."
+                            docker build -f Dockerfile.selenium.light -t foodhub-selenium-tests:latest .
                         '''
                         
                         // Run Selenium tests in Docker container
