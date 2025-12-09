@@ -62,26 +62,37 @@ pipeline {
                 // Wait for services to be ready and healthy
                 echo 'Waiting for services to start and become healthy...'
                 sh '''
+                    echo "Initial 30 second wait for containers to initialize..."
                     sleep 30
+                    
                     echo "Checking if frontend is accessible..."
-                    for i in {1..10}; do
+                    COUNTER=0
+                    MAX_ATTEMPTS=15
+                    while [ $COUNTER -lt $MAX_ATTEMPTS ]; do
                         if curl -f http://localhost:3001/ > /dev/null 2>&1; then
-                            echo "Frontend is ready!"
+                            echo "✓ Frontend is ready!"
                             break
                         fi
-                        echo "Waiting for frontend... (attempt $i/10)"
+                        COUNTER=$((COUNTER+1))
+                        echo "Waiting for frontend... (attempt $COUNTER/$MAX_ATTEMPTS)"
                         sleep 10
                     done
                     
                     echo "Checking if backend is accessible..."
-                    for i in {1..10}; do
+                    COUNTER=0
+                    while [ $COUNTER -lt $MAX_ATTEMPTS ]; do
                         if curl -f http://localhost:8082/health > /dev/null 2>&1 || curl -f http://localhost:8082/ > /dev/null 2>&1; then
-                            echo "Backend is ready!"
+                            echo "✓ Backend is ready!"
                             break
                         fi
-                        echo "Waiting for backend... (attempt $i/10)"
+                        COUNTER=$((COUNTER+1))
+                        echo "Waiting for backend... (attempt $COUNTER/$MAX_ATTEMPTS)"
                         sleep 10
                     done
+                    
+                    echo "Final service status check..."
+                    curl -I http://localhost:3001/ || echo "WARNING: Frontend not responding"
+                    curl -I http://localhost:8082/ || echo "WARNING: Backend not responding"
                 '''
                 
                 // Verify containers are running

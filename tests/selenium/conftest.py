@@ -60,13 +60,16 @@ def driver():
 @pytest.fixture(scope="session")
 def base_url():
     """Base URL for the FoodHub application"""
-    return "http://localhost:3000"
+    import os
+    # In Docker, use service name; otherwise localhost
+    return os.getenv("BASE_URL", "http://localhost:3000")
 
 
 @pytest.fixture(scope="session")
 def api_url():
     """Base URL for the FoodHub API"""
-    return "http://localhost:8080"
+    import os
+    return os.getenv("API_URL", "http://localhost:8080")
 
 
 def pytest_html_report_title(report):
