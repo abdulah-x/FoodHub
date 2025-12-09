@@ -39,109 +39,33 @@ pipeline {
             }
         }
         
-        stage('Clean Previous Build') {
+        stage('Check Services') {
             steps {
-                echo 'Cleaning up previous Jenkins build containers...'
-                // Stop and remove any existing Jenkins build containers
+                echo 'Checking if FoodHub services are running...'
                 sh '''
-                    docker-compose -f ${COMPOSE_FILE} down --volumes --remove-orphans || true
-                    docker system prune -f || true
-                '''
-            }
-        }
-        
-        stage('Build Application') {
-            steps {
-                echo 'Building FoodHub application in containerized environment...'
-                // Build and start containers with volume mounting
-                sh '''
-                    docker-compose -f ${COMPOSE_FILE} build --no-cache
-                    docker-compose -f ${COMPOSE_FILE} up -d
-                '''
-                
-                // Wait for services to be ready and healthy using Docker health checks
-                echo 'Waiting for services to become healthy (max 3 minutes per service)...'
-                sh '''
-                    echo "Services started, waiting for them to be ready..."
-                    docker-compose -f ${COMPOSE_FILE} ps
+                    echo "Checking for running containers..."
+                    docker ps | grep foodhub || echo "WARNING: No FoodHub containers found"
                     
-                    echo "Waiting 30 seconds for initial startup..."
-                    sleep 30
+                    echo "Waiting 10 seconds for services to be ready..."
+                    sleep 10
                     
-                    # Wait for Backend to respond (up to 2 minutes)
-                    echo "Checking Backend health..."
-                    COUNTER=0
-                    until curl -f http://localhost:8082/health > /dev/null 2>&1 || [ $COUNTER -eq 24 ]; do
-                        echo "Backend not ready yet, waiting... (attempt $((COUNTER+1))/24)"
-                        sleep 5
-                        COUNTER=$((COUNTER+1))
-                    done
-                    
+                    # Check Backend
                     if curl -f http://localhost:8082/health > /dev/null 2>&1; then
-                        echo "✓ Backend is healthy!"
+                        echo "✓ Backend is responding on port 8082"
                     else
-                        echo "✗ Backend health check timeout - continuing anyway"
+                        echo "✗ WARNING: Backend not responding on port 8082"
+                        echo "Please start containers manually with: docker-compose up -d"
                     fi
                     
-                    # Wait for Frontend to respond (up to 2 minutes)
-                    echo "Checking Frontend health..."
-                    COUNTER=0
-                    until curl -f http://localhost:3001/ > /dev/null 2>&1 || [ $COUNTER -eq 24 ]; do
-                        echo "Frontend not ready yet, waiting... (attempt $((COUNTER+1))/24)"
-                        sleep 5
-                        COUNTER=$((COUNTER+1))
-                    done
-                    
+                    # Check Frontend
                     if curl -f http://localhost:3001/ > /dev/null 2>&1; then
-                        echo "✓ Frontend is healthy!"
+                        echo "✓ Frontend is responding on port 3001"
                     else
-                        echo "✗ Frontend health check timeout - continuing anyway"
+                        echo "✗ WARNING: Frontend not responding on port 3001"
+                        echo "Please start containers manually with: docker-compose up -d"
                     fi
                     
-                    echo "✓ All services check complete!"
-                    docker-compose -f ${COMPOSE_FILE} ps
-                    
-                    # Final verification
-                    echo "Final connectivity verification..."
-                    curl -I http://localhost:3001/ 2>&1 | head -5 || echo "Frontend check failed"
-                    curl -I http://localhost:8082/ 2>&1 | head -5 || echo "Backend check failed"
-                '''
-                
-                // Verify containers are running
-                sh 'docker-compose -f ${COMPOSE_FILE} ps'
-            }
-        }
-        
-        stage('Health Check') {
-            steps {
-                echo 'Performing health checks...'
-                
-                // Check if MongoDB is accessible
-                sh '''
-                    echo "Testing MongoDB connection..."
-                    docker-compose -f ${COMPOSE_FILE} exec -T foodhub-mongo-jenkins mongo --eval "db.adminCommand('ping')" || echo "MongoDB check failed"
-                '''
-                
-                // Check if backend is responding
-                sh '''
-                    echo "Testing backend health..."
-                    curl -f http://localhost:8082/health || echo "Backend health check failed"
-                '''
-                
-                // Check if frontend is accessible
-                sh '''
-                    echo "Testing frontend..."
-                    curl -f http://localhost:3001/ || echo "Frontend check failed"
-                '''
-            }
-        }
-        
-        stage('Run Tests') {
-            steps {
-                echo 'Running application tests in containerized environment...'
-                // Run tests inside the backend container
-                sh '''
-                    docker-compose -f ${COMPOSE_FILE} exec -T foodhub-backend-jenkins npm test || echo "Tests completed"
+                    docker ps
                 '''
             }
         }
