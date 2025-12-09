@@ -6,7 +6,7 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copy package files first (for better Docker layer caching)
-COPY package*.json ./
+COPY backend/package*.json ./
 
 # Install production dependencies with retry logic
 RUN npm install --only=production --loglevel=error --no-audit || \
@@ -21,8 +21,8 @@ RUN apk add --no-cache wget
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
 
-# Copy the rest of the application code
-COPY . .
+# Copy the backend application code
+COPY backend/ .
 
 # Change ownership of the app directory to nodejs user
 RUN chown -R nodejs:nodejs /app
