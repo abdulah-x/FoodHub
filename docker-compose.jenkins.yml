@@ -15,6 +15,12 @@ services:
       - foodhub_mongo_jenkins_data:/data/db
     networks:
       - foodhub-jenkins-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
   # Backend Node.js API service for Jenkins builds
   foodhub-backend-jenkins:
@@ -36,8 +42,16 @@ services:
       - ./package.json:/app/package.json
       - /app/node_modules
     depends_on:
-      - foodhub-mongo-jenkins
+      foodhub-mongo-jenkins:
+        condition: service_healthy
     networks:
+      - foodhub-jenkins-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
       - foodhub-jenkins-network
 
   # Frontend React service for Jenkins builds
@@ -56,9 +70,16 @@ services:
       - ./package.json:/app/package.json
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - foodhub-backend-jenkins
+      foodhub-backend-jenkins:
+        condition: service_healthy
     networks:
       - foodhub-jenkins-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
 
 volumes:
   foodhub_mongo_jenkins_data:
