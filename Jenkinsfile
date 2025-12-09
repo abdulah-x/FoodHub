@@ -59,9 +59,30 @@ pipeline {
                     docker-compose -f ${COMPOSE_FILE} up -d
                 '''
                 
-                // Wait for services to be ready
-                echo 'Waiting for services to start...'
-                sh 'sleep 30'
+                // Wait for services to be ready and healthy
+                echo 'Waiting for services to start and become healthy...'
+                sh '''
+                    sleep 30
+                    echo "Checking if frontend is accessible..."
+                    for i in {1..10}; do
+                        if curl -f http://localhost:3001/ > /dev/null 2>&1; then
+                            echo "Frontend is ready!"
+                            break
+                        fi
+                        echo "Waiting for frontend... (attempt $i/10)"
+                        sleep 10
+                    done
+                    
+                    echo "Checking if backend is accessible..."
+                    for i in {1..10}; do
+                        if curl -f http://localhost:8082/health > /dev/null 2>&1 || curl -f http://localhost:8082/ > /dev/null 2>&1; then
+                            echo "Backend is ready!"
+                            break
+                        fi
+                        echo "Waiting for backend... (attempt $i/10)"
+                        sleep 10
+                    done
+                '''
                 
                 // Verify containers are running
                 sh 'docker-compose -f ${COMPOSE_FILE} ps'
