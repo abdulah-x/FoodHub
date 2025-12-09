@@ -16,7 +16,7 @@ services:
     networks:
       - foodhub-jenkins-network
     healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -52,7 +52,6 @@ services:
       timeout: 5s
       retries: 5
       start_period: 40s
-      - foodhub-jenkins-network
 
   # Frontend React service for Jenkins builds
   foodhub-frontend-jenkins:
