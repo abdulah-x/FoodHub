@@ -221,6 +221,41 @@ pipeline {
                 docker-compose -f ${COMPOSE_FILE} down --volumes --remove-orphans || true
                 docker system prune -f || true
             '''
+            
+            // Send email notification with test results
+            script {
+                def gitAuthor = sh(script: "git log -1 --pretty=format:'%an <%ae>'", returnStdout: true).trim()
+                def gitMessage = sh(script: "git log -1 --pretty=format:'%s'", returnStdout: true).trim()
+                def buildStatus = currentBuild.currentResult
+                def statusEmoji = buildStatus == 'SUCCESS' ? '✅' : (buildStatus == 'UNSTABLE' ? '⚠️' : '❌')
+                
+                emailext (
+                    to: gitAuthor,
+                    subject: "${statusEmoji} Jenkins Build #${BUILD_NUMBER} - ${buildStatus}: ${JOB_NAME}",
+                    body: """
+                        <html>
+                        <body>
+                            <h2>${statusEmoji} Jenkins Build ${buildStatus}</h2>
+                            <p><strong>Project:</strong> ${JOB_NAME}</p>
+                            <p><strong>Build Number:</strong> ${BUILD_NUMBER}</p>
+                            <p><strong>Status:</strong> ${buildStatus}</p>
+                            <p><strong>Commit by:</strong> ${gitAuthor}</p>
+                            <p><strong>Commit Message:</strong> ${gitMessage}</p>
+                            <p><strong>Build Duration:</strong> ${currentBuild.durationString.replace(' and counting', '')}</p>
+                            <hr>
+                            <h3>Test Results:</h3>
+                            <p>View detailed test results here: <a href="${BUILD_URL}HTML_20Report/">Selenium Test Report</a></p>
+                            <p>Full Console Output: <a href="${BUILD_URL}console">Console Log</a></p>
+                            <hr>
+                            <p><em>This email was automatically sent by Jenkins CI/CD Pipeline</em></p>
+                        </body>
+                        </html>
+                    """,
+                    mimeType: 'text/html',
+                    attachLog: false,
+                    attachmentsPattern: 'tests/selenium/reports/test_report.html'
+                )
+            }
         }
         
         success {
