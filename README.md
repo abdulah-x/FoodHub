@@ -1,4 +1,4 @@
-# 🍕 FoodHub - Modern Food Delivery Platform
+ # 🍕 FoodHub - Modern Food Delivery Platform
 
 A full-stack, containerized food delivery platform built with React.js, Node.js, and MongoDB. FoodHub transforms the traditional food ordering experience with a modern, role-based architecture supporting customers, restaurant owners, and administrators.
 
