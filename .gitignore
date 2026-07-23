@@ -44,3 +44,11 @@ coverage/
 pids/
 .npm
 .cache/
+
+# Block Python artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+venv/
+.venv/
